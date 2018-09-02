@@ -1,7 +1,9 @@
 package com.elon.graphql;
 
 import com.elon.graphql.model.Author;
+import com.elon.graphql.model.Book;
 import com.elon.graphql.repository.AuthorRepository;
+import com.elon.graphql.repository.BookRepository;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -15,9 +17,12 @@ public class GraphqlApplication {
 	}
 
 	@Bean
-	public CommandLineRunner demo(AuthorRepository authorRepository) {
+	public CommandLineRunner demo(AuthorRepository authorRepository, BookRepository bookRepository) {
 		return (args) -> {
-			authorRepository.save(new Author("elon", "kwon"));
+			Author author = new Author("elon", "kwon");
+			authorRepository.save(author);
+			bookRepository.save(new Book("Java: A Beginner's Guide, Sixth Edition", "0071809252", 728, author));
+
 		};
 	}
 
