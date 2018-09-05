@@ -23,4 +23,14 @@ public class QueryTest {
         Assert.assertNotNull(query.countAuthors());
     }
 
+    @Test
+    public void findAllBooks() {
+        Assert.assertNotNull(query.findAllBooks());
+    }
+
+    @Test
+    public void countBooks() {
+        Assert.assertNotNull(query.countBooks());
+    }
+
 }
