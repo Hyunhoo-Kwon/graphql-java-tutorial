@@ -6,4 +6,7 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface AuthorRepository extends CrudRepository<Author, Long> {
+    default Author findOneAuthor(Long id) {
+        return findById(id).orElse(null);
+    }
 }
