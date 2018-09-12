@@ -15,7 +15,7 @@ import static org.hamcrest.core.IsInstanceOf.instanceOf;
 import static org.junit.Assert.assertThat;
 
 @RunWith(SpringRunner.class)
-@SpringBootTest
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class MutationTest {
     @Autowired
     Mutation mutation;
@@ -32,7 +32,7 @@ public class MutationTest {
     @Test
     public void newBook() {
         assertThat(mutation.newBook("booktest Title", "000993333", 520, (long) 1),
-                is(instanceOf(Author.class)));
+                is(instanceOf(Book.class)));
     }
 
     @Test
