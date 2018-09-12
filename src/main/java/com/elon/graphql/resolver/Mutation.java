@@ -1,6 +1,7 @@
 package com.elon.graphql.resolver;
 
 import com.coxautodev.graphql.tools.GraphQLMutationResolver;
+import com.elon.graphql.exception.BookNotFoundException;
 import com.elon.graphql.model.Author;
 import com.elon.graphql.model.Book;
 import com.elon.graphql.repository.AuthorRepository;
@@ -38,7 +39,8 @@ public class Mutation implements GraphQLMutationResolver {
     }
 
     public Book updateBookPageCount(Integer pageCount, Long id) {
-        Book book = bookRepository.findOneBook(id);
+        Book book = bookRepository.findById(id).orElseThrow(
+                ()->new BookNotFoundException("The book to be updated was not found", id));
         book.setPageCount(pageCount);
         bookRepository.save(book);
         return book;

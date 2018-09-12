@@ -1,5 +1,6 @@
 package com.elon.graphql.resolver;
 
+import com.elon.graphql.exception.BookNotFoundException;
 import com.elon.graphql.model.Author;
 import com.elon.graphql.model.Book;
 import com.elon.graphql.repository.BookRepository;
@@ -45,6 +46,11 @@ public class MutationTest {
     public void updateBookPageCount() {
         assertThat(mutation.updateBookPageCount(340, (long) 2),
                 is(instanceOf(Book.class)));
+    }
+
+    @Test(expected = BookNotFoundException.class)
+    public void updateBookPageCountWithInvalidId() {
+        mutation.updateBookPageCount(340, (long) 10);
     }
 
 }
