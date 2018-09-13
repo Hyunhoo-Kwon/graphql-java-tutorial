@@ -8,8 +8,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import static org.hamcrest.Matchers.anyOf;
-import static org.hamcrest.Matchers.nullValue;
+import java.util.NoSuchElementException;
+
+import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsInstanceOf.instanceOf;
 import static org.junit.Assert.assertThat;
 
@@ -26,10 +27,13 @@ public class BookRepositoryTest {
 
     @Test
     public void findOneBook() {
-        assertThat(bookRepository.findOneBook((long) 1),
-                anyOf(instanceOf(Book.class), nullValue()));
-        assertThat(bookRepository.findOneBook((long) 10),
-                anyOf(instanceOf(Book.class), nullValue()));
+        assertThat(bookRepository.findById((long) 1).get(),
+                is(instanceOf(Book.class)));
+    }
+
+    @Test(expected = NoSuchElementException.class)
+    public void findOneBookWithInvalidId() {
+        bookRepository.findById((long) 10).get();
     }
 
 }
