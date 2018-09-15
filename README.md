@@ -8,8 +8,8 @@ This tutorial will use:
  - Gradle
 
 
-## 1. Setting up the project
-Go to [new Spring Boot Project](https://start.spring.io/) and choose the following options:
+## 1. 프로젝트 환경설정
+[스프링 부트 프로젝트 생성](https://start.spring.io/) 옵션:
  - Gradle Project
  - Java
  - As dependencies:
@@ -19,8 +19,10 @@ Go to [new Spring Boot Project](https://start.spring.io/) and choose the followi
    - DevTools
    - Lombok
 
-
-In [build.gradle](https://github.com/Hyunhoo-Kwon/graphql-java-tutorial/blob/master/build.gradle), add the [graphql-spring-boot-starter](https://github.com/graphql-java/graphql-spring-boot), [graphiql-spring-boot-starter](https://github.com/graphql-java/graphql-spring-boot) and [graphql-java-tools](https://github.com/graphql-java/graphql-java-tools)
+[build.gradle](https://github.com/Hyunhoo-Kwon/graphql-java-tutorial/blob/master/build.gradle) 파일에 디펜던시 추가:
+  - [graphql-spring-boot-starter](https://github.com/graphql-java/graphql-spring-boot)
+  - [graphiql-spring-boot-starter](https://github.com/graphql-java/graphql-spring-boot)
+  - [graphql-java-tools](https://github.com/graphql-java/graphql-java-tools)
 ```
 dependencies {
 	compile('org.springframework.boot:spring-boot-starter-data-jpa')
@@ -35,8 +37,7 @@ dependencies {
 }
 ```
 
-Update your Gradle configuration and run the main class.
-You can go to http://localhost:8080/h2-console/login.jsp and enter the following information:
+H2 데이터베이스 접속 방법: http://localhost:8080/h2-console/login.jsp
 - JDBC URL: jdbc:h2:mem:testdb
 - User Name: sa
 - Password: (empty)
