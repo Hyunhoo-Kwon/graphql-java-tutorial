@@ -1,5 +1,6 @@
 package com.elon.graphql;
 
+import com.elon.graphql.exception.GraphQLErrorHandlerConfig;
 import com.elon.graphql.model.Author;
 import com.elon.graphql.model.Book;
 import com.elon.graphql.repository.AuthorRepository;
@@ -8,8 +9,10 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Import;
 
 @SpringBootApplication
+@Import(GraphQLErrorHandlerConfig.class)
 public class GraphqlApplication {
 
 	public static void main(String[] args) {

@@ -4,7 +4,6 @@ import com.elon.graphql.exception.BookNotFoundException;
 import com.elon.graphql.model.Author;
 import com.elon.graphql.model.Book;
 import com.elon.graphql.repository.BookRepository;
-import graphql.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
