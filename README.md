@@ -47,6 +47,32 @@ This tutorial will use:
 	  }
 	}
    ```
+ - GraphQL 스키마 & 타입
+   - 객체 타입
+   > GraphQL 스키마의 가장 기본적인 구성 요소는 객체 타입입니다. 객체 타입은 서비스에서 가져올 수 있는 객체의 종류와 그 객체의 필드를 나타내며 객체 타입의 모든 필드는 0개 이상의 인수를 가질 수 있습니다.
+   ```
+   type Book {
+	    id: ID!
+	    title: String!
+	    isbn: String!
+	    pageCount: Int
+	    author: Author
+	}
+   ```
+       - !는 필드가 non-nullable임을 의미합니다.
+       - ID는 객체를 다시 요청하거나 캐시의 키로써 자주 사용되는 고유 식별자를 나타냅니다. ID 타입은 String과 같은 방법으로 직렬화됩니다.
+   - query & mutation 타입
+   > GraphQL 스키마 내에는 특수한 두 가지 타입, query와 mutation이 있습니다. 모든 GraphQL 서비스는 query 타입을 가지며 mutation 타입은 가질 수도 있고 가지지 않을 수도 있습니다. 이러한 타입은 일반 객체 타입과 동일하지만 모든 GraphQL 쿼리의 진입점을 정의하므로 특별합니다.
+   ```
+   type Query {
+	    findAllBooks: [Book]!
+	}
+
+	type Mutation {
+	    newBook(title: String!, isbn: String!, pageCount: Int, author: ID!) : Book!
+	}
+   ```
+       - [Book]!은 Book 객체의 array 를 나타냅니다. 또한 non-nullable 이기 때문에 findAllBooks 필드를 쿼리할 때 항상(0개 이상의 아이템을 가진) 배열을 기대할 수 있습니다.
 
 ## GraphQL API 서버 구현 예제
 ### 1. 프로젝트 환경설정
