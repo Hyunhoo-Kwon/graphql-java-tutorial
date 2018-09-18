@@ -293,7 +293,7 @@ This tutorial will use:
 
 	}
 	```
-API 호출 테스트: 
+API 호출 테스트: https://github.com/Hyunhoo-Kwon/graphql-java-tutorial/blob/master/README.md#4-api-%ED%98%B8%EC%B6%9C-%ED%85%8C%EC%8A%A4%ED%8A%B8
 
 #### 3-2. Book GraphQL 구현
 > Book GraphQL 구현 전체 코드: https://github.com/Hyunhoo-Kwon/graphql-java-tutorial/tree/book/src/main
@@ -374,6 +374,7 @@ API 호출 테스트:
 	     return book;
 	 }
 	 ```
+API 호출 테스트: https://github.com/Hyunhoo-Kwon/graphql-java-tutorial/blob/master/README.md#4-api-%ED%98%B8%EC%B6%9C-%ED%85%8C%EC%8A%A4%ED%8A%B8
 
 ### 4. API 호출 테스트
  1. GraphQL 스키마 구조 확인: http://localhost:8080/graphql/schema.json
