@@ -110,9 +110,9 @@ This tutorial will use:
 	- Password: (empty)
 
 ### 2. 데이터 모델
->데이터 모델 전체 코드: https://github.com/Hyunhoo-Kwon/graphql-java-tutorial/tree/feature/domain
+>데이터 모델 전체 코드: https://github.com/Hyunhoo-Kwon/graphql-java-tutorial/tree/domain/src/main/java/com/elon/graphql
 
- 1. 엔티티 추가: model 패키지에 Author, Book 엔티티 추가
+ 1. 엔티티 구현: model 패키지에 Author, Book 엔티티 구현
 	 - Author.java
 	 ```
 	 @Entity
@@ -163,7 +163,7 @@ This tutorial will use:
 		}
 	}
 	 ```
- 2. CRUD repository 구현: repository 패키지에 AuthorRepository, BookRepository 인터페이스 추가
+ 2. CRUD repository 구현: repository 패키지에 AuthorRepository, BookRepository 인터페이스 구현
 	 - AuthorRepository.java
 	 ```
 	 @Repository
@@ -187,7 +187,7 @@ This tutorial will use:
 		};
 	}
 	 ```
- 4. 테스트 코드:
+ 4. 테스트 코드 작성:
 	 - AuthorRepositoryTest.java
 	 ```
 	 @RunWith(SpringRunner.class)
@@ -218,3 +218,78 @@ This tutorial will use:
 
 	}
 	 ```
+### 3. GraphQL 구현
+#### 3-1. Author GraphQL 구현
+> Author GraphQL 구현 전체 코드: https://github.com/Hyunhoo-Kwon/graphql-java-tutorial/tree/author/src/main
+ 1. Author 스키마 추가: GraphQL 스키마는 .graphqls 파일에 정의한다. /src/main/resources/graphql 폴더에 author.graphqls 작성
+	 - author.graphqls
+	 ```
+	 type Author {
+	    id: ID!
+	    firstName: String!
+	    lastName: String!
+	}
+
+	type Query {
+	    findAllAuthors: [Author]!
+	    countAuthors: Long!
+	}
+
+	type Mutation {
+	    newAuthor(firstName: String!, lastName: String!) : Author!
+	}
+	 ```
+ 2. Author Query 구현: resolver 패키지에 Query 클래스 구현. Query는 GraphQLQueryResolver를 구현하여 작성할 수 있다.
+	 - Query.java
+	 ```
+	 @Service
+	public class Query implements GraphQLQueryResolver {
+	    @Autowired
+	    private AuthorRepository authorRepository;
+
+	    public Iterable<Author> findAllAuthors() {
+		return authorRepository.findAll();
+	    }
+
+	    public long countAuthors() {
+		return authorRepository.count();
+	    }
+	}
+	 ```
+3. Author mutaion 구현: resolver 패키지에 Mutation 클래스 구현. Mutation는 GraphQLMutationResolver를 구현하여 작성할 수 있다.
+	- Mutation.java
+	```
+	@Service
+	public class Mutation implements GraphQLMutationResolver {
+	    @Autowired
+	    private AuthorRepository authorRepository;
+
+	    public Author newAuthor(String firstName, String lastName) {
+		Author author = new Author(firstName, lastName);
+		authorRepository.save(author);
+		return author;
+	    }
+	}
+	```
+4. 테스트 코드 작성:
+	- QueryTest.java
+	> graphql-spring-boot-starter:5.0.2 버전 junit test 버그로 @SpringBootTest에 webEnvironment 설정 필요. (참조: [graphql-spring-boot issue #113](https://github.com/graphql-java/graphql-spring-boot/issues/113))
+	```
+	@RunWith(SpringRunner.class)
+	@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+	public class QueryTest {
+	    @Autowired
+	    Query query;
+
+	    @Test
+	    public void findAllAuthors() {
+		Assert.assertNotNull(query.findAllAuthors());
+	    }
+
+	    @Test
+	    public void countAuthors() {
+		Assert.assertNotNull(query.countAuthors());
+	    }
+
+	}
+	```
