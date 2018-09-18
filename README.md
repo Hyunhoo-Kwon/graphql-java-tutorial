@@ -293,6 +293,7 @@ This tutorial will use:
 
 	}
 	```
+API 호출 테스트: 
 
 #### 3-2. Book GraphQL 구현
 > Book GraphQL 구현 전체 코드: https://github.com/Hyunhoo-Kwon/graphql-java-tutorial/tree/book/src/main
@@ -373,4 +374,101 @@ This tutorial will use:
 	     return book;
 	 }
 	 ```
- 
+
+### 4. API 호출 테스트
+ 1. GraphQL 스키마 구조 확인: http://localhost:8080/graphql/schema.json
+ 2. curl을 이용한 HTTP 호출 테스트: 요청은 다음과 같이 /graphql endpoint에 JSON으로 전송합니다
+	 - query - finaAllAuthors 호출
+	 ```
+	 curl \
+	  -X POST \
+	  -H "Content-Type: application/json" \
+	  -d '{ "query": “query { findAllAuthors { id firstName lastName } }" }' \
+	  http://localhost:8080/graphql
+	 ```
+	 - mutation - deleteBook 호출
+	 ```
+	 curl \
+	  -X POST \
+	  -H "Content-Type: application/json" \
+	  -d '{ "query": "mutation { deleteBook(id: 2) }" }' \
+	  http://localhost:8080/graphql
+	 ```
+ 3. [GraphiQL](https://github.com/graphql/graphiql)을 이용한 HTTP 호출 테스트:
+	 - query - findAllAuthors 호출
+	 ```
+	 query {
+	  findAllAuthors {
+	    id
+	    firstName
+	    lastName
+	  }
+	}
+	 ```
+	 - query - countAuthor 호출
+	 ```
+	 query {
+	  countAuthors 
+	}
+	 ```
+	 - query - findAllBooks 호출
+	 ```
+	 query {
+	  findAllBooks {
+	    id
+	    title
+	    isbn
+	    pageCount
+	    author {
+	      firstName
+	      lastName
+	    }
+	  }
+	}
+	 ```
+	 - mutation - newAuthor 호출
+	 ```
+	 mutation {
+	  newAuthor(firstName: "star", lastName: "bucks") {
+	    id,
+	    firstName,
+	    lastName
+	  } 
+	}
+	```
+	- mutation - newBook 호출
+	```
+	mutation {
+	  newBook(title: "GraphQL Guide Book", isbn: "003728402", pageCount: 530, author: 1) {
+	    id
+	    title
+	    isbn
+	    pageCount
+			author {
+	      firstName
+	      lastName
+	    }
+	  } 
+	}
+	```
+	- mutation - updateBookPageCount 호출
+	```
+	mutation {
+	  updateBookPageCount(pageCount: 200, id: 2) {
+	    id
+	    title
+	    isbn
+	    pageCount
+			author {
+	      firstName
+	      lastName
+	    }
+	  } 
+	}
+	```
+	- mutation - deleteBook 호출
+	```
+	mutation {
+	  deleteBook(id: 2)
+	}
+	```
