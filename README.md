@@ -239,7 +239,7 @@ This tutorial will use:
 	    newAuthor(firstName: String!, lastName: String!) : Author!
 	}
 	 ```
- 2. Author Query 구현: resolver 패키지에 Query 클래스 구현. Query는 GraphQLQueryResolver를 구현하여 작성할 수 있다.
+ 2. Author query 구현: resolver 패키지에 Query 클래스 구현. Query는 GraphQLQueryResolver를 구현하여 작성할 수 있다.
 	 - Query.java
 	 ```
 	 @Service
@@ -293,3 +293,84 @@ This tutorial will use:
 
 	}
 	```
+
+#### 3-2. Book GraphQL 구현
+> Book GraphQL 구현 전체 코드: https://github.com/Hyunhoo-Kwon/graphql-java-tutorial/tree/book/src/main
+ 1. Book 스키마 추가:
+	 - book.graphqls
+	 ```
+	 type Book {
+	    id: ID!
+	    title: String!
+	    isbn: String!
+	    pageCount: Int
+	    author: Author
+	}
+
+	extend type Query {
+	    findAllBooks: [Book]!
+	    countBooks: Long!
+	}
+
+	extend type Mutation {
+	    newBook(title: String!, isbn: String!, pageCount: Int, author: ID!) : Book!
+	    deleteBook(id: ID!) : Boolean
+	    updateBookPageCount(pageCount: Int!, id: ID!) : Book!
+	}
+	 ```
+	 > extend Query 타입, extend Mutation 타입: 런타임시 다음과 같이 Query, Mutaion에 포함된다
+	 ```
+	 type Query {
+	    findAllAuthors: [Author]!
+	    countAuthors: Long!
+	    findAllBooks: [Book]!
+	    countBooks: Long!
+	}
+	 ```
+ 2. Book query 구현:
+	 - Query.java
+	 ```
+	 // ...
+
+	 @Autowired
+	 private BookRepository bookRepository;
+
+	 public Iterable<Book> findAllBooks() {
+	     return bookRepository.findAll();
+	 }
+
+	 public long countBooks() {
+	     return bookRepository.count();
+	 }
+	 ```
+ 3. Book mutation 구현:
+	 - Mutation.java
+	 ```
+	 // ...
+
+	 @Autowired
+	 private BookRepository bookRepository;
+
+	 public Book newBook(String title, String isbn, Integer pageCount, Long authorId) {
+	     Book book = new Book();
+	     book.setAuthor(new Author(authorId));
+	     book.setTitle(title);
+	     book.setIsbn(isbn);
+	     book.setPageCount(pageCount != null ? pageCount : 0);
+	     bookRepository.save(book);
+	     return book;
+	 }
+
+	 public boolean deleteBook(Long id) {
+	     bookRepository.deleteById(id);
+	     return true;
+	 }
+
+	 public Book updateBookPageCount(Integer pageCount, Long id) {
+	     Book book = bookRepository.findById(id).orElse(null);
+	     book.setPageCount(pageCount);
+	     bookRepository.save(book);
+	     return book;
+	 }
+	 ```
+ 
