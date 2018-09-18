@@ -108,3 +108,113 @@ H2 데이터베이스 접속 방법: http://localhost:8080/h2-console/login.jsp
 - JDBC URL: jdbc:h2:mem:testdb
 - User Name: sa
 - Password: (empty)
+
+### 2. 데이터 모델
+>데이터 모델 전체 코드: https://github.com/Hyunhoo-Kwon/graphql-java-tutorial/tree/feature/domain
+
+ 1. 엔티티 추가: model 패키지에 Author, Book 엔티티 추가
+	 - Author.java
+	 ```
+	 @Entity
+		@NoArgsConstructor @Data
+		public class Author {
+			@Id
+			@GeneratedValue(strategy= GenerationType.AUTO)
+			private Long id;
+
+			private String firstName;
+
+			private String lastName;
+
+			public Author(Long id) {
+			this.id = id;
+			}
+
+			public Author(String firstName, String lastName) {
+			this.firstName = firstName;
+			this.lastName = lastName;
+			}
+		}
+	 ```
+	 - Book.java
+	 ```
+	 @Entity
+		@NoArgsConstructor @Data
+		public class Book {
+			@Id
+			@GeneratedValue(strategy= GenerationType.AUTO)
+			private Long id;
+
+			private String title;
+
+			private String isbn;
+
+			private int pageCount;
+
+			@ManyToOne
+			@JoinColumn(name = "author_id", nullable = false, updatable = false)
+			private Author author;
+
+			public Book(String title, String isbn, int pageCount, Author author) {
+			this.title = title;
+			this.isbn = isbn;
+			this.pageCount = pageCount;
+			this.author = author;
+			}
+		}
+	 ```
+ 2. CRUD repository 구현: repository 패키지에 AuthorRepository, BookRepository 인터페이스 추가
+	 - AuthorRepository.java
+	 ```
+	 @Repository
+	public interface AuthorRepository extends CrudRepository<Author, Long> { }
+	 ```
+	 - BookRepository.java
+	 ```
+	 @Repository
+	public interface BookRepository extends CrudRepository<Book, Long> { }
+	 ```
+ 3. (Option) 스프링 애플리케이션 실행 시 데이터베이스에 데이터 insert:
+	 - GraphqlApplication.java에 CommandLineRunner로 데이터 insert 구현
+	 ```
+	 @Bean
+		public CommandLineRunner demo(AuthorRepository authorRepository, BookRepository bookRepository) {
+			return (args) -> {
+				Author author = new Author("elon", "kwon");
+				authorRepository.save(author);
+				bookRepository.save(new Book("Java: A Beginner's Guide, Sixth Edition", "0071809252", 728, author));
+
+			};
+		}
+	 ```
+ 4. 테스트 코드:
+	 - AuthorRepositoryTest.java
+	 ```
+	 @RunWith(SpringRunner.class)
+		@SpringBootTest
+		public class AuthorRepositoryTest {
+			@Autowired
+			AuthorRepository authorRepository;
+
+			@Test
+			public void findAll() {
+			Assert.assertNotNull(authorRepository.findAll());
+			}
+
+		}
+	 ```
+	 - BookRepositoryTest.java
+	 ```
+	 @RunWith(SpringRunner.class)
+		@SpringBootTest
+		public class BookRepositoryTest {
+			@Autowired
+			BookRepository bookRepository;
+
+			@Test
+			public void findAll() {
+				Assert.assertNotNull(bookRepository.findAll());
+			}
+
+		}
+	 ```
