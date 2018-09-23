@@ -386,6 +386,98 @@ API 호출 테스트: https://github.com/Hyunhoo-Kwon/graphql-java-tutorial/blob
 	 ```
 API 호출 테스트: https://github.com/Hyunhoo-Kwon/graphql-java-tutorial/blob/master/README.md#4-api-%ED%98%B8%EC%B6%9C-%ED%85%8C%EC%8A%A4%ED%8A%B8
 
+#### 3-3. 예외처리
+> 예외처리 구현 전체 코드: https://github.com/Hyunhoo-Kwon/graphql-java-tutorial/tree/errorHandler/src/main/java/com/elon/graphql
+
+ 1. 미구현 예외 처리방법 살펴보기:
+   - 서버 측에서 처리되지 않은 예외는 [DefaultGraphQLErrorHandler](https://github.com/graphql-java/graphql-java-servlet/blob/master/src/main/java/graphql/servlet/DefaultGraphQLErrorHandler.java)에 의해 클라이언트에 Internal server error를 반환합니다.
+   ```
+   public List<GraphQLError> processErrors(List<GraphQLError> errors) {
+        final List<GraphQLError> clientErrors = filterGraphQLErrors(errors);
+        if (clientErrors.size() < errors.size()) {
+
+            // Some errors were filtered out to hide implementation - put a generic error in place.
+            clientErrors.add(new GenericGraphQLError("Internal Server Error(s) while executing query"));
+
+            // ...
+        }
+
+        return clientErrors;
+    }
+   ```
+   - 클라이언트 Internal server error 메세지
+   ```
+   {
+  "data": {
+    "deleteBook": null
+  },
+  "errors": [
+    {
+      "message": "Internal Server Error(s) while executing query",
+      "path": null,
+      "extensions": null
+    }
+  ]
+}
+   ```
+ 2. GraphQLError 구현:
+   - 클라이언트에 올바른 에러를 반환하기 위해서 GraphQLError를 구현하여 예외를 작성해야 합니다.
+   - BookNotFoundException 구현: exception 패키지에 BookNotFoundException 예외 작성.
+   ```
+   public class BookNotFoundException extends RuntimeException implements GraphQLError {
+
+    private Map<String, Object> extensions = new HashMap<>();
+
+    public BookNotFoundException(String message, Long invalidBookId) {
+        super(message);
+        extensions.put("invalidBookId", invalidBookId);
+    }
+
+    @Override
+    public List<SourceLocation> getLocations() {
+        return null;
+    }
+
+    @Override
+    public ErrorType getErrorType() {
+        return ErrorType.DataFetchingException;
+    }
+
+    @Override
+    public Map<String, Object> getExtensions() {
+        return extensions;
+    }
+}
+   ```
+ 3. updateBookPageCount 메소드 수정: Mutation 클래스 - updateBookPageCount 메소드 실행시 존재하지 않는 Book Id 일때 BookNotFoundException 발생.
+ ```
+ @Service
+public class Mutation implements GraphQLMutationResolver {
+    // ...
+
+    public Book updateBookPageCount(Integer pageCount, Long id) {
+        Book book = bookRepository.findById(id).orElseThrow(
+                ()->new BookNotFoundException("The book to be updated was not found", id));
+        book.setPageCount(pageCount);
+        bookRepository.save(book);
+        return book;
+    }
+}
+ ```
+ 4. 테스트 코드 작성:
+ ```
+ @RunWith(SpringRunner.class)
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+public class MutationTest {
+    //...
+
+    @Test(expected = BookNotFoundException.class)
+    public void updateBookPageCountWithInvalidId() {
+        mutation.updateBookPageCount(340, (long) 10);
+    }
+}
+ ```
+
 ### 4. API 호출 테스트
  1. GraphQL 스키마 구조 확인: http://localhost:8080/graphql/schema.json
  2. curl을 이용한 HTTP 호출 테스트: 요청은 다음과 같이 /graphql endpoint에 JSON으로 전송합니다
