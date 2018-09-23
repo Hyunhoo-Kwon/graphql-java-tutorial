@@ -15,7 +15,7 @@ This tutorial will use:
 	2. [데이터 모델](https://github.com/Hyunhoo-Kwon/graphql-java-tutorial/blob/master/README.md#2-%EB%8D%B0%EC%9D%B4%ED%84%B0-%EB%AA%A8%EB%8D%B8)
 	3. [GraphQL 구현](https://github.com/Hyunhoo-Kwon/graphql-java-tutorial/blob/master/README.md#3-graphql-%EA%B5%AC%ED%98%84)
 	4. [API 호출 테스트](https://github.com/Hyunhoo-Kwon/graphql-java-tutorial/blob/master/README.md#4-api-%ED%98%B8%EC%B6%9C-%ED%85%8C%EC%8A%A4%ED%8A%B8)
- 3. [참고]()
+ 3. [참고](https://github.com/Hyunhoo-Kwon/graphql-java-tutorial/blob/master/README.md#%EC%B0%B8%EA%B3%A0)
 
 ## GraphQL 이란
 [GraphQL](https://graphql.org/)은 페이스북이 2012년 개발하여 2015년 공개적으로 발표된 API를 위한 쿼리 언어이며 REST 아키텍처를 대체할 수 있습니다. 클라이언트는 필요한 데이터의 구조를 지정할 수 있으며, 서버는 정확히 동일한 구조로 데이터를 반환합니다. GraphQL은 특정 데이터베이스 또는 스토리지 엔진과 연결되어 있지 않으며 대신 기존 코드 및 데이터에 의해 뒷받침됩니다.
