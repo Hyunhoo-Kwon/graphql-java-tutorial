@@ -477,6 +477,156 @@ public class MutationTest {
     }
 }
  ```
+ - 클라이언트 BookNotFoundException 에러 메세지: 클라이언트는 에러 메세지와 함께 전체 stack trace를 반환받습니다.
+ ```
+ {
+  "data": null,
+  "errors": [
+    {
+      "message": "Exception while fetching data (/updateBookPageCount) : The book to be updated was not found",
+      "path": [
+        "updateBookPageCount"
+      ],
+      "exception": {
+        "cause": null,
+        "stackTrace": [
+          {
+            "methodName": "lambda$updateBookPageCount$0",
+            "fileName": "Mutation.java",
+            "lineNumber": 43,
+            "className": "com.elon.graphql.resolver.Mutation",
+            "nativeMethod": false
+          },
+          {
+            "methodName": "orElseThrow",
+            "fileName": "Optional.java",
+            "lineNumber": 290,
+            "className": "java.util.Optional",
+            "nativeMethod": false
+          },
+          ...
+        ],
+        ...
+      },
+      "locations": [
+        {
+          "line": 2,
+          "column": 3,
+          "sourceName": null
+        }
+      ],
+      "extensions": {
+        "invalidBookId": 200
+      },
+      "errorType": "DataFetchingException"
+    }
+  ]
+}
+ ```
+#### (Option) 3-4. 예외처리 - 클라이언트에 stack trace 감추기
+> 예외처리 - 클라이언트에 stack trace 감추기 전체코드: https://github.com/Hyunhoo-Kwon/graphql-java-tutorial/tree/graphql1.0.0/src/main/java/com/elon/graphql
+ 
+ 1. GraphQLErrorAdapter 구현: 
+   - _(Internal server error를 반환할 때 사용하는 [GenericGraphQLError](https://github.com/graphql-java/graphql-java-servlet/blob/master/src/main/java/graphql/servlet/GenericGraphQLError.java) 클래스를 참고하여 GraphQLErrorAdapter 클래스 구현)_
+   - GraphQLError 예외를 감싸기 위한 GraphQLErrorAdapter 클래스
+   ```
+   public class GraphQLErrorAdapter implements GraphQLError {
+
+    private GraphQLError error;
+
+    public GraphQLErrorAdapter(GraphQLError error) {
+        this.error = error;
+    }
+
+    @Override
+    public String getMessage() {
+        return error.getMessage();
+    }
+
+    @JsonIgnore
+    @Override
+    public List<SourceLocation> getLocations() {
+        return error.getLocations();
+    }
+
+    @JsonIgnore
+    @Override
+    public ErrorType getErrorType() {
+        return error.getErrorType();
+    }
+
+    @Override
+    public List<Object> getPath() {
+        return error.getPath();
+    }
+
+    @Override
+    public Map<String, Object> toSpecification() {
+        return error.toSpecification();
+    }
+
+    @Override
+    public Map<String, Object> getExtensions() {
+        return error.getExtensions();
+    }
+}
+   ```
+   
+ 2. GraphQLErrorHandler 재정의:
+   - 스프링 @Configuration 클래스에 [DefaultGraphQLErrorHandler](https://github.com/graphql-java/graphql-java-servlet/blob/master/src/main/java/graphql/servlet/DefaultGraphQLErrorHandler.java)를 대체할 GraphQLErrorHandler 재정의
+   - GraphQLErrorHandlerConfig 클래스에 GraphQLErrorHandler 재정의
+     - DefaultGraphQLErrorHandler과 비교: filterGraphQLErrors 메소드에서 클라이언트 에러를 GraphQLErrorAdapter로 감싸도록 변경
+   ```
+   @Configuration
+public class GraphQLErrorHandlerConfig {
+
+    public static final Logger log = LoggerFactory.getLogger(DefaultGraphQLErrorHandler.class);
+
+    @Bean
+    public GraphQLErrorHandler errorHandler() {
+        return new GraphQLErrorHandler() {
+            @Override
+            public List<GraphQLError> processErrors(List<GraphQLError> errors) {
+                List<GraphQLError> clientErrors = this.filterGraphQLErrors(errors);
+                // ...
+            }
+
+            private List<GraphQLError> filterGraphQLErrors(List<GraphQLError> errors) {
+                return (List)errors.stream().filter(this::isClientError).map(GraphQLErrorAdapter::new).collect(Collectors.toList());
+            }
+
+            private boolean isClientError(GraphQLError error) {
+                // ...
+            }
+        };
+    }
+}
+   ```
+   - GraphqlApplication 클래스에 GraphQLErrorHandlerConfig 임포트
+   ```
+   @SpringBootApplication
+@Import(GraphQLErrorHandlerConfig.class)
+public class GraphqlApplication {
+// ...
+}
+   ```
+ - 클라이언트 BookNotFoundException 에러 메세지: 클라이언트는 stack trace를 제외한 에러 메세지를 반환받습니다.
+ ```
+ {
+  "data": null,
+  "errors": [
+    {
+      "message": "Exception while fetching data (/updateBookPageCount) : The book to be updated was not found",
+      "path": [
+        "updateBookPageCount"
+      ],
+      "extensions": {
+        "invalidBookId": 200
+      }
+    }
+  ]
+}
+ ```
 
 ### 4. API 호출 테스트
  1. GraphQL 스키마 구조 확인: http://localhost:8080/graphql/schema.json
