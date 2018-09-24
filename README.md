@@ -337,7 +337,20 @@ API 호출 테스트: https://github.com/Hyunhoo-Kwon/graphql-java-tutorial/blob
 	    countBooks: Long!
 	}
 	 ```
- 2. Book query 구현:
+ 2. Book resolver 구현: field resolver를 사용하여 해당 필드의 값을 할당할 수 있습니다. field resolver와 데이터 bean 둘 다 동일한 GraphQL 필드의 메소드를 가질 경우 field resolver를 우선합니다.
+ 	 - BookResolver.java: Book 엔티티에 정의된 getAuthor 메소드 보다 BookResolver에 정의된 getAuthor 메소드를 우선합니다.
+	 ```
+	 @Service
+	public class BookResolver implements GraphQLResolver<Book> {
+	    @Autowired
+	    AuthorRepository authorRepository;
+
+	    public Author getAuthor(Book book) {
+		return authorRepository.findById(book.getAuthor().getId()).orElse(null);
+	    }
+	}
+	 ```
+ 3. Book query 구현:
 	 - Query.java
 	 ```
 	 // ...
@@ -353,7 +366,7 @@ API 호출 테스트: https://github.com/Hyunhoo-Kwon/graphql-java-tutorial/blob
 	     return bookRepository.count();
 	 }
 	 ```
- 3. Book mutation 구현:
+ 4. Book mutation 구현:
 	 - Mutation.java
 	 ```
 	 // ...
