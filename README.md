@@ -648,7 +648,7 @@ public class GraphqlApplication {
 	 curl \
 	  -X POST \
 	  -H "Content-Type: application/json" \
-	  -d '{ "query": “query { findAllAuthors { id firstName lastName } }" }' \
+	  -d '{ "query": "query { findAllAuthors { id firstName lastName } }" }' \
 	  http://localhost:8080/graphql
 	 ```
 	 - mutation - deleteBook 호출
